@@ -3,6 +3,7 @@ package com.sampleApp.crud.system.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,7 +25,7 @@ public class EmployeeController {
     @Autowired 
     EmployeeRepo employeerepo;
 
-    @GetMapping 
+    @GetMapping
     public List<Employee> getEmployees(){
         return  employeerepo.findAll();
     }
@@ -33,8 +34,20 @@ public class EmployeeController {
         return employeerepo.save(employee);
     }
     @PutMapping("/{id}")
-    public Employee update(@Validated @NonNull @RequestBody Employee employee){
-        return employeerepo.save(employee);
+    public ResponseEntity<Employee> updateEmployee(@PathVariable long id,@RequestBody Employee employeeDetails) {
+        Employee updateEmployee = employeerepo.findById((int) id)
+                .orElseThrow();
+
+        updateEmployee.setName(employeeDetails.getName());
+        updateEmployee.setLastName(employeeDetails.getLastName());
+        updateEmployee.setEmail(employeeDetails.getEmail());
+        updateEmployee.setDepartment(employeeDetails.getDepartment());
+        updateEmployee.setContactNo(employeeDetails.getContactNo());
+        updateEmployee.setGender(employeeDetails.getGender());
+
+        employeerepo.save(updateEmployee);
+
+        return ResponseEntity.ok(updateEmployee);
     }
     @DeleteMapping(value = "/{id}")
     public void delete(@PathVariable int id) {
